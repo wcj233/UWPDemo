@@ -1,0 +1,95 @@
+﻿<Page
+    x:Class="UWPDemo.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:UWPDemo"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    <Grid>
+
+        <SplitView IsPaneOpen="True"
+           DisplayMode="Inline"
+           OpenPaneLength="296">
+            <SplitView.Pane>
+                <TextBlock Text="Pane"
+                   FontSize="24"
+                   VerticalAlignment="Center"
+                   HorizontalAlignment="Center"/>
+            </SplitView.Pane>
+
+            <Grid>
+                <CommandBar DefaultLabelPosition="Bottom">
+                     <AppBarButton x:Name="changeBg" Icon="RepeatAll" Label="changeBg" Click="clickToChangeBg"/>
+                </CommandBar>
+
+                <RelativePanel x:Name="panelBg">
+                    <TextBox x:Name="firstNum" Width="100" Height="60" Header="First Num" VerticalAlignment="Top" Margin="0,100,20,0" TextChanged="firstNum_TextChanged">
+                    </TextBox>
+                    <ComboBox x:Name="calculate" Header="calculate" PlaceholderText="calType" Width="90" Margin="0,0,20,0" SelectionChanged="calculate_SelectionChanged">
+                        <x:String>+</x:String>
+                        <x:String>-</x:String>
+                        <x:String>*</x:String>
+                        <x:String>/</x:String>
+                    </ComboBox>
+                    <TextBox x:Name="secondNum" Width="100" Height="60" Header="second Num" TextChanged="secondNum_TextChanged">
+                    </TextBox>
+                    <TextBlock x:Name="equal" Text="=" Margin="20,15,0,0">
+                    </TextBlock>
+                    <TextBlock x:Name="result" Margin="20,15,0,0" Width="100">
+                    </TextBlock>
+                    <TextBlock x:Name="errorStr" Margin="0,30,0,0">
+                    </TextBlock>
+                    
+                    
+                </RelativePanel>
+                
+            </Grid>
+        </SplitView>
+
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup x:Name="WindowState">
+                <VisualState x:Name="WideState">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="800" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="calculate.(RelativePanel.RightOf)" Value="firstNum"/>
+                        <Setter Target="calculate.(RelativePanel.AlignBottomWith)" Value="firstNum"/>
+                        <Setter Target="secondNum.(RelativePanel.RightOf)" Value="calculate"/>
+                        <Setter Target="secondNum.(RelativePanel.AlignBottomWith)" Value="firstNum"/>
+                        <Setter Target="equal.(RelativePanel.RightOf)" Value="secondNum"/>
+                        <Setter Target="equal.(RelativePanel.AlignVerticalCenterWith)" Value="calculate"/>
+                        <Setter Target="result.(RelativePanel.RightOf)" Value="equal"/>
+                        <Setter Target="result.(RelativePanel.AlignVerticalCenterWith)" Value="equal"/>
+                        <Setter Target="errorStr.(RelativePanel.AlignLeftWithPanel)" Value="true"/>
+                        <Setter Target="errorStr.(RelativePanel.Below)" Value="firstNum"/>
+                        <Setter Target="errorStr.(RelativePanel.AlignRightWithPanel)" Value="true"/>
+                    </VisualState.Setters>
+                </VisualState>
+
+                <VisualState x:Name="NarrowState">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="0" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="calculate.(RelativePanel.Below)" Value="firstNum"/>
+                        <Setter Target="calculate.(Margin)" Value="0,15,0,0"/>
+                        <Setter Target="secondNum.(RelativePanel.Below)" Value="calculate"/>
+                        <Setter Target="secondNum.(Margin)" Value="0,15,0,0"/>
+                        <Setter Target="equal.(RelativePanel.Below)" Value="secondNum"/>
+                        <Setter Target="equal.(Margin)" Value="0,15,0,0"/>
+                        <Setter Target="equal.(RelativePanel.AlignHorizontalCenterWith)" Value="calculate"/>
+                        <Setter Target="result.(RelativePanel.Below)" Value="equal"/>
+                        <Setter Target="result.(Margin)" Value="0,15,0,0"/>
+                        <Setter Target="errorStr.(RelativePanel.Below)" Value="result"/>
+                        <Setter Target="errorStr.(Margin)" Value="0,15,0,0"/>
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
+
+
+    </Grid>
+</Page>
