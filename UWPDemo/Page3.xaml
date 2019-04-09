@@ -1,0 +1,56 @@
+﻿<Page
+    x:Class="UWPDemo.Page3"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:UWPDemo"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+    xmlns:buttonModel="using:UWPDemo" >
+    <Page.DataContext>
+        <buttonModel:HostViewModel x:Name="viewModelInDataContext"/>
+    </Page.DataContext>
+    <Grid>
+        <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                <ListView x:Name="recordingsListView" ItemsSource="{x:Bind ViewModel.Recordings}">
+                    <ListView.ItemTemplate>
+                        <DataTemplate x:DataType="local:Recording">
+                            <StackPanel Orientation="Horizontal" Margin="6">
+                                <SymbolIcon Symbol="Audio" Margin="0,0,12,0"/>
+                                <StackPanel>
+                                    <TextBlock Text="{x:Bind CompositionName}"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+                <StackPanel DataContext="{Binding SelectedItem, ElementName=recordingsListView}"
+            Margin="0,24,0,0">
+                    <TextBlock Text="{Binding Path = ArtistName}"/>
+                    <TextBlock Text="{Binding CompositionName}"/>
+                </StackPanel>
+                <StackPanel>
+                    <Button Content="{x:Bind Path=buttonModel.NextButtonText, Mode=OneWay}" Click="buttonClickAction" x:Name="tryButton"/>
+                    <TextBox x:Name="write"/>
+                    <Button Content="{Binding Text,ElementName=write, Mode=OneWay}"/>
+                </StackPanel>
+            </StackPanel>
+        </Grid>
+
+        <!--<ListView ItemsSource="{x:Bind ViewModel.Recordings}" HorizontalAlignment="Center">
+            <ListView.ItemTemplate>
+                <DataTemplate x:DataType="local:Recording">
+                    <StackPanel Margin="10">
+                        <TextBlock Text="{x:Bind ArtistName}" FontWeight="Bold"></TextBlock>
+                        <TextBlock Text="{x:Bind CompositionName}"></TextBlock>
+                    </StackPanel>
+                    
+                </DataTemplate>
+                
+            </ListView.ItemTemplate>
+            
+        </ListView>-->
+    </Grid>
+</Page>

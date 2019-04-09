@@ -3,8 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Text;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.Storage;
+using Windows.Storage.Search;
 using Windows.UI;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -30,6 +33,17 @@ namespace UWPDemo
 
         private void clickToChangeBg(object sender, RoutedEventArgs e)
         {
+            //StorageFolder testFolder = await StorageFolder.GetFolderFromPathAsync(@"C:\Users\fayw\Desktop");
+            //StorageFile sourceFile = await testFolder.GetFileAsync("heihei");
+            //string name = sourceFile.Name;
+            //string path = sourceFile.Path;
+            //IReadOnlyList < IStorageItem > items = await testFolder.GetItemsAsync();
+            //foreach (IStorageItem itemm in items) {
+            //    //if (itemm is StorageFile) {
+            //        string nn = itemm.Name;
+            //    //}
+            //}
+
             //AppBarButton cb = sender as AppBarButton;
             Random ro = new Random(10);
             long tick = DateTime.Now.Ticks;
@@ -47,6 +61,8 @@ namespace UWPDemo
 
         private void firstNum_TextChanged(object sender, TextChangedEventArgs e)
         {
+            var picker = new Windows.Storage.Pickers.FileOpenPicker();
+
             int transFirstNum = 0;
             bool isRight = int.TryParse(firstNum.Text, out transFirstNum);
             if (isRight == false && firstNum.Text.Length > 0)
