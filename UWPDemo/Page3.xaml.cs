@@ -29,11 +29,11 @@ namespace UWPDemo
     {
         private string nextButtonText;
 
-        public event PropertyChangedEventHandler PropertyChanged = delegate { };
+        public event PropertyChangedEventHandler PropertyChanged;
 
         public HostViewModel()
         {
-            this.NextButtonText = "Next";
+            this.nextButtonText = "Next";
         }
 
         public string NextButtonText
@@ -45,7 +45,6 @@ namespace UWPDemo
                 this.OnPropertyChanged();
             }
         }
-
         public void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             // Raise the PropertyChanged event, passing the name of the property whose value has changed.
@@ -85,10 +84,10 @@ namespace UWPDemo
         public Frame RootFrame { get { return Window.Current.Content as Frame; } }
         public Page3()
         {
-            this.InitializeComponent();
-
+            this.InitializeComponent();        
             this.ViewModel = new RecordingViewModel();
             this.buttonModel = new HostViewModel();
+            this.DataContext = buttonModel;
         }
         public RecordingViewModel ViewModel { get; set; }
         public HostViewModel buttonModel { get; set; }
@@ -98,6 +97,12 @@ namespace UWPDemo
             this.buttonModel.NextButtonText = "Updated Next button text";
             //tryButton.Content = "Bye";
             //string name = this.buttonModel.NextButtonText;
+        }
+
+        private void write_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            //string text = write.Text;
+            //this.buttonModel.NextButtonText = "Updated Next button text";
         }
     }
 }

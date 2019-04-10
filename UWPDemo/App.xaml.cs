@@ -40,6 +40,41 @@ namespace UWPDemo
             //WriteTimestamp();
         }
 
+        protected override void OnFileActivated(FileActivatedEventArgs args)
+        {
+            // TODO: Handle file activation
+            // The number of files received is args.Files.Size
+            // The name of the first file is args.Files[0].Name
+            string name = args.Files[0].Name;
+            var rootFrame = new Frame();
+            rootFrame.Navigate(typeof(MainPage), args);
+            Window.Current.Content = rootFrame;
+            Window.Current.Activate();
+        }
+
+        protected override void OnActivated(IActivatedEventArgs args)
+        {
+            if (args.Kind == ActivationKind.Protocol)
+            {
+                ProtocolActivatedEventArgs eventArgs = args as ProtocolActivatedEventArgs;
+                // TODO: Handle URI activation
+                // The received URI is eventArgs.Uri.AbsoluteUri
+                var uri = eventArgs.Uri;
+
+                var frame = Window.Current.Content as Frame;
+
+                if (frame == null)
+                    frame = new Frame();
+
+                // Navigates to MainPage, passing the Uri to it.
+                frame.Navigate(typeof(Page4), uri);
+                Window.Current.Content = frame;
+
+                // Ensure the current window is active
+                Window.Current.Activate();
+            }
+        }
+
         async void WriteTimestamp()
         {
             //StorageFolder testFolder = await StorageFolder.GetFolderFromPathAsync(@"C:\Intel\Logs");
@@ -106,7 +141,7 @@ namespace UWPDemo
                     // When the navigation stack isn't restored navigate to the first page,
                     // configuring the new page by passing required information as a navigation
                     // parameter
-                    rootFrame.Navigate(typeof(Page3), e.Arguments);
+                    rootFrame.Navigate(typeof(Page4), e.Arguments);
                     ReadTimestamp();
                 }
                 // Ensure the current window is active

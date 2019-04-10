@@ -8,9 +8,9 @@
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
     xmlns:buttonModel="using:UWPDemo" >
-    <Page.DataContext>
+    <!--<Page.DataContext>
         <buttonModel:HostViewModel x:Name="viewModelInDataContext"/>
-    </Page.DataContext>
+    </Page.DataContext>-->
     <Grid>
         <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
             <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
@@ -32,9 +32,9 @@
                     <TextBlock Text="{Binding CompositionName}"/>
                 </StackPanel>
                 <StackPanel>
-                    <Button Content="{x:Bind Path=buttonModel.NextButtonText, Mode=OneWay}" Click="buttonClickAction" x:Name="tryButton"/>
-                    <TextBox x:Name="write"/>
-                    <Button Content="{Binding Text,ElementName=write, Mode=OneWay}"/>
+                    <Button Content="{Binding NextButtonText, Mode=OneWay}" Click="buttonClickAction" x:Name="tryButton"/>
+                    <TextBox x:Name="write" Text="{Binding Path=NextButtonText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" TextChanged="write_TextChanged"/>
+                    <!--<Button Content="{Binding Text,ElementName=write, Mode=OneWay}"/>-->
                 </StackPanel>
             </StackPanel>
         </Grid>

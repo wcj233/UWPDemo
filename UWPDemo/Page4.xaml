@@ -24,21 +24,26 @@
         </GridView>-->
 
         <StackPanel>
-            <!--<TextBox Name="NewBlogUrl"></TextBox>
-            <Button Click="Add_Click">Add</Button>-->
+            <!--<TextBox Name="NewBlogUrl"></TextBox>-->
+            <Button Click="Add_Click">Add</Button>
             <ListView Name="Blogs"  Height="300"
                       ScrollViewer.HorizontalScrollMode="Enabled" 
                       ScrollViewer.HorizontalScrollBarVisibility="Auto"
                       ScrollViewer.VerticalScrollMode="Disabled"
-                      ScrollViewer.VerticalScrollBarVisibility="Hidden">
+                      ScrollViewer.VerticalScrollBarVisibility="Hidden" ItemsSource="{x:Bind ViewModel.pictures,Mode=OneWay}">
                 <ListView.ItemsPanel>
                     <ItemsPanelTemplate>
                         <ItemsWrapGrid/>
                     </ItemsPanelTemplate>
                 </ListView.ItemsPanel>
-                <Image x:Name="firstImage" Height="200" Width="200" Stretch="UniformToFill" Source="Assets/1.jpg"/>
-                <Image x:Name="secondImage" Height="200" Width="200" Stretch="UniformToFill" Source="Assets/1.jpg"/>
-                <Image x:Name="thirdImage" Height="200" Width="200" Stretch="UniformToFill" Source="Assets/1.jpg"/>
+                <ListView.ItemTemplate>
+                    <DataTemplate x:DataType="local:Picture">
+                        <StackPanel>
+                        <Image x:Name="firstImage" Height="200" Width="200" Stretch="UniformToFill" Source="{x:Bind picturePath}"/>
+                        <TextBox Name="NewBlogUrl" Text="{x:Bind picturePath}"></TextBox>
+                        </StackPanel>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
             </ListView>
         </StackPanel>
     </Grid>
