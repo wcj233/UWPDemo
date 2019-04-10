@@ -43,7 +43,6 @@ namespace UWPDemo
                     string strFilePath = fileArgs.Files[0].Path;
                     var file = (StorageFile)fileArgs.Files[0];
                     string name = file.Name;
-                    //await LoadFasFile(file);
                 }
             }
         }
