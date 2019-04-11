@@ -4,8 +4,10 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using Windows.ApplicationModel.Activation;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.Storage;
 using Windows.System;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -86,15 +88,141 @@ namespace UWPDemo
 
         private async void Add_Click(object sender, RoutedEventArgs e)
         {
-            
-            var uriA = new Uri("alsdk:");
-            var promptOptions = new Windows.System.LauncherOptions();
-            promptOptions.TreatAsUntrusted = true;
-            promptOptions.DesiredRemainingView = Windows.UI.ViewManagement.ViewSizePreference.UseMinimum;
-            var success = await Launcher.LaunchUriAsync(uriA,promptOptions);
-            if (success) {
 
+            // Path to the file in the app package to launch
+            //Escape one:
+            //string imageFile = "Assets\\1.jpg";
+            //two
+            string imageFile = @"Assets\1.jpg";
+
+            var file = await Windows.ApplicationModel.Package.Current.InstalledLocation.GetFileAsync(imageFile);
+
+            if (file != null)
+            {
+                // Launch the retrieved file
+                var options = new Windows.System.LauncherOptions();
+                options.DisplayApplicationPicker = true;
+
+                // Launch the retrieved file
+                bool success = await Windows.System.Launcher.LaunchFileAsync(file, options);
+
+                if (success)
+                {
+                    // File launched
+                }
+                else
+                {
+                    // File launch failed
+                }
+            }
+            else
+            {
+                // Could not find file
+            }
+            //var uriA = new Uri("alsdk:");
+            //var promptOptions = new Windows.System.LauncherOptions();
+            //promptOptions.TreatAsUntrusted = true;
+            //promptOptions.DesiredRemainingView = Windows.UI.ViewManagement.ViewSizePreference.UseMinimum;
+            //var success = await Launcher.LaunchUriAsync(uriA,promptOptions);
+            //if (success) {
+
+            //}
+        }
+
+        async internal void DisplayImages(Windows.Storage.StorageFolder rootFolder)
+        {
+            // Display images from first folder in root\DCIM.
+            var dcimFolder = await rootFolder.GetFolderAsync("DCIM");
+            var folderList = await dcimFolder.GetFoldersAsync();
+            var cameraFolder = folderList[0];
+            var fileList = await cameraFolder.GetFilesAsync();
+            for (int i = 0; i < fileList.Count; i++)
+            {
+                var file = (Windows.Storage.StorageFile)fileList[i];
+                WriteMessageText(file.Name + "\n");
+                DisplayImage(file, i);
             }
         }
+
+        async private void DisplayImage(Windows.Storage.IStorageItem file, int index)
+        {
+            try
+            {
+                var sFile = (Windows.Storage.StorageFile)file;
+                Windows.Storage.Streams.IRandomAccessStream imageStream =
+                    await sFile.OpenAsync(Windows.Storage.FileAccessMode.Read);
+                Windows.UI.Xaml.Media.Imaging.BitmapImage imageBitmap =
+                    new Windows.UI.Xaml.Media.Imaging.BitmapImage();
+                imageBitmap.SetSource(imageStream);
+                var element = new Image();
+                element.Source = imageBitmap;
+                element.Height = 100;
+                Thickness margin = new Thickness();
+                margin.Top = index * 100;
+                element.Margin = margin;
+                FilesCanvas.Children.Add(element);
+            }
+            catch (Exception e)
+            {
+                WriteMessageText(e.Message + "\n");
+            }
+        }
+
+        // Write a message to MessageBlock on the UI thread.
+        private Windows.UI.Core.CoreDispatcher messageDispatcher = Window.Current.CoreWindow.Dispatcher;
+
+        private async void WriteMessageText(string message, bool overwrite = false)
+        {
+            await messageDispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal,
+                () =>
+                {
+                    if (overwrite)
+                        FilesBlock.Text = message;
+                    else
+                        FilesBlock.Text += message;
+                });
+        }
+
+        async internal void CopyImages(Windows.Storage.StorageFolder rootFolder)
+        {
+            // Copy images from first folder in root\DCIM.
+            var dcimFolder = await rootFolder.GetFolderAsync("DCIM");
+            var folderList = await dcimFolder.GetFoldersAsync();
+            var cameraFolder = folderList[0];
+            var fileList = await cameraFolder.GetFilesAsync();
+
+            try
+            {
+                var folderName = "Images " + DateTime.Now.ToString("yyyy-MM-dd HHmmss");
+                Windows.Storage.StorageFolder imageFolder = await
+                    Windows.Storage.KnownFolders.PicturesLibrary.CreateFolderAsync(folderName);
+
+                foreach (Windows.Storage.IStorageItem file in fileList)
+                {
+                    CopyImage(file, imageFolder);
+                }
+            }
+            catch (Exception e)
+            {
+                WriteMessageText("Failed to copy images.\n" + e.Message + "\n");
+            }
+        }
+
+        async internal void CopyImage(Windows.Storage.IStorageItem file,
+                                      Windows.Storage.StorageFolder imageFolder)
+        {
+            try
+            {
+                Windows.Storage.StorageFile sFile = (Windows.Storage.StorageFile)file;
+                await sFile.CopyAsync(imageFolder, sFile.Name);
+                WriteMessageText(sFile.Name + " copied.\n");
+            }
+            catch (Exception e)
+            {
+                WriteMessageText("Failed to copy file.\n" + e.Message + "\n");
+            }
+        }
+
+
     }
 }

@@ -31,6 +31,7 @@ namespace UWPDemo
         /// </summary>
         public App()
         {
+            string familyName = Windows.ApplicationModel.Package.Current.Id.FamilyName;
             this.InitializeComponent();
             this.Suspending += OnSuspending;
             this.EnteredBackground += AppEnteredBackground;
@@ -42,37 +43,55 @@ namespace UWPDemo
 
         protected override void OnFileActivated(FileActivatedEventArgs args)
         {
-            // TODO: Handle file activation
-            // The number of files received is args.Files.Size
-            // The name of the first file is args.Files[0].Name
-            string name = args.Files[0].Name;
-            var rootFrame = new Frame();
-            rootFrame.Navigate(typeof(MainPage), args);
-            Window.Current.Content = rootFrame;
-            Window.Current.Activate();
+            if (args.Verb == "show")
+            {
+                Frame rootFrame = (Frame)Window.Current.Content;
+                Page4 page = (Page4)rootFrame.Content;
+
+                // Call DisplayImages with root folder from camera storage.
+                page.DisplayImages((Windows.Storage.StorageFolder)args.Files[0]);
+            }
+            else if (args.Verb == "copy")
+            {
+                Frame rootFrame = (Frame)Window.Current.Content;
+                Page4 page = (Page4)rootFrame.Content;
+
+                // Call CopyImages with root folder from camera storage.
+                page.CopyImages((Windows.Storage.StorageFolder)args.Files[0]);
+            }
+            else {
+                // TODO: Handle file activation
+                // The number of files received is args.Files.Size
+                // The name of the first file is args.Files[0].Name
+                string name = args.Files[0].Name;
+                var rootFrame = new Frame();
+                rootFrame.Navigate(typeof(MainPage), args);
+                Window.Current.Content = rootFrame;
+                Window.Current.Activate();
+            }
+
+            
         }
 
         protected override void OnActivated(IActivatedEventArgs args)
         {
+            var frame = Window.Current.Content as Frame;
+            if (frame == null)
+                frame = new Frame();
+            Window.Current.Content = frame;
             if (args.Kind == ActivationKind.Protocol)
             {
+                //no result
                 ProtocolActivatedEventArgs eventArgs = args as ProtocolActivatedEventArgs;
-                // TODO: Handle URI activation
-                // The received URI is eventArgs.Uri.AbsoluteUri
-                var uri = eventArgs.Uri;
-
-                var frame = Window.Current.Content as Frame;
-
-                if (frame == null)
-                    frame = new Frame();
-
-                // Navigates to MainPage, passing the Uri to it.
-                frame.Navigate(typeof(Page4), uri);
-                Window.Current.Content = frame;
-
-                // Ensure the current window is active
-                Window.Current.Activate();
+                frame.Navigate(typeof(Page4), eventArgs.Uri);
+                
             }
+            else if (args.Kind == ActivationKind.ProtocolForResults) {
+                //result
+                ProtocolForResultsActivatedEventArgs eventArgs = args as ProtocolForResultsActivatedEventArgs;
+                frame.Navigate(typeof(MainPage), eventArgs);
+            }
+            Window.Current.Activate();  
         }
 
         async void WriteTimestamp()

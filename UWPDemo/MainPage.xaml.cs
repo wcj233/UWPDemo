@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
+using Windows.ApplicationModel.Activation;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Storage;
@@ -31,20 +32,36 @@ namespace UWPDemo
             this.InitializeComponent();
         }
 
+        //protected override void OnNavigatedTo(NavigationEventArgs e)
+        //{
+        //    base.OnNavigatedTo(e);
+        //    var args = e.Parameter as Windows.ApplicationModel.Activation.IActivatedEventArgs;
+        //    if (args != null)
+        //    {
+        //        if (args.Kind == Windows.ApplicationModel.Activation.ActivationKind.File)
+        //        {
+        //            var fileArgs = args as Windows.ApplicationModel.Activation.FileActivatedEventArgs;
+        //            string strFilePath = fileArgs.Files[0].Path;
+        //            var file = (StorageFile)fileArgs.Files[0];
+        //            string name = file.Name;
+        //        }
+        //    }
+        //}
+
+        private Windows.System.ProtocolForResultsOperation _operation = null;
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
-            base.OnNavigatedTo(e);
-            var args = e.Parameter as Windows.ApplicationModel.Activation.IActivatedEventArgs;
-            if (args != null)
+            var protocolForResultsArgs = e.Parameter as ProtocolForResultsActivatedEventArgs;
+            // Set the ProtocolForResultsOperation field.
+            _operation = protocolForResultsArgs.ProtocolForResultsOperation;
+
+            if (protocolForResultsArgs.Data.ContainsKey("TestData"))
             {
-                if (args.Kind == Windows.ApplicationModel.Activation.ActivationKind.File)
-                {
-                    var fileArgs = args as Windows.ApplicationModel.Activation.FileActivatedEventArgs;
-                    string strFilePath = fileArgs.Files[0].Path;
-                    var file = (StorageFile)fileArgs.Files[0];
-                    string name = file.Name;
-                }
+                string dataFromCaller = protocolForResultsArgs.Data["TestData"] as string;
             }
+            ValueSet result = new ValueSet();
+            result["ReturnedData"] = "The returned result";
+            _operation.ReportCompleted(result);
         }
 
 

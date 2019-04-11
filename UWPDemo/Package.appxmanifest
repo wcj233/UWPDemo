@@ -31,7 +31,25 @@
           <uap:FileTypeAssociation Name="alsdk2">
             <uap:Logo>Assets\2.jpg</uap:Logo>
             <uap:SupportedFileTypes>
-              <uap:FileType>.alsdk2</uap:FileType>
+              <uap:FileType>.txt</uap:FileType>
+            </uap:SupportedFileTypes>
+          </uap:FileTypeAssociation>
+        </uap:Extension>
+        <uap:Extension Category="windows.protocol">
+          <uap:Protocol Name="test-app2app" ReturnResults="none" />
+        </uap:Extension>
+        <uap:Extension Category="windows.autoPlayContent">
+          <uap:AutoPlayContent>
+            <uap:LaunchAction Verb="show" ActionDisplayName="Show Pictures" ContentEvent="ShowPicturesOnArrival" />
+            <uap:LaunchAction Verb="copy" ActionDisplayName="Copy Pictures Into Library" ContentEvent="ShowPicturesOnArrival" />
+          </uap:AutoPlayContent>
+        </uap:Extension>
+        <uap:Extension Category="windows.fileTypeAssociation">
+          <uap:FileTypeAssociation Name="image_association1">
+            <uap:DisplayName>AutoPlay Copy</uap:DisplayName>
+            <uap:SupportedFileTypes>
+              <uap:FileType>.jpg</uap:FileType>
+              <uap:FileType>.png</uap:FileType>
             </uap:SupportedFileTypes>
           </uap:FileTypeAssociation>
         </uap:Extension>
@@ -40,6 +58,7 @@
   </Applications>
   <Capabilities>
     <uap:Capability Name="picturesLibrary" />
+    <uap:Capability Name="removableStorage" />
     <rescap:Capability Name="broadFileSystemAccess" />
   </Capabilities>
 </Package>
