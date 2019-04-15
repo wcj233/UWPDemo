@@ -16,6 +16,7 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using Windows.Storage;
+using Windows.ApplicationModel.Background;
 
 namespace UWPDemo
 {
@@ -39,6 +40,20 @@ namespace UWPDemo
             Windows.System.MemoryManager.AppMemoryUsageLimitChanging += MemoryManager_AppMemoryUsageLimitChanging;
             Windows.System.MemoryManager.AppMemoryUsageIncreased += MemoryManager_AppMemoryUsageIncreased;
             //WriteTimestamp();
+            register();
+        }
+
+        public async void register() {
+            await BackgroundExecutionManager.RequestAccessAsync();
+        }
+
+        //in-process background task
+        //respond to your background trigger when it fires
+        protected override void OnBackgroundActivated(BackgroundActivatedEventArgs args)
+        {
+            base.OnBackgroundActivated(args);
+            IBackgroundTaskInstance taskInstance = args.TaskInstance;
+            //DoYourBackgroundWork(taskInstance);
         }
 
         protected override void OnFileActivated(FileActivatedEventArgs args)
@@ -160,7 +175,7 @@ namespace UWPDemo
                     // When the navigation stack isn't restored navigate to the first page,
                     // configuring the new page by passing required information as a navigation
                     // parameter
-                    rootFrame.Navigate(typeof(Page4), e.Arguments);
+                    rootFrame.Navigate(typeof(Page5), e.Arguments);
                     ReadTimestamp();
                 }
                 // Ensure the current window is active

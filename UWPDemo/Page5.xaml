@@ -1,0 +1,40 @@
+﻿<Page
+    x:Class="UWPDemo.Page5"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:UWPDemo"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <Grid>
+        <!--<Image x:Name="Image" CanDrag="True" Margin="10,292,10,0" Height="338" Source="Assets\1.jpg"></Image>-->
+        <ListView 
+          ScrollViewer.HorizontalScrollMode="Enabled" 
+          ScrollViewer.HorizontalScrollBarVisibility="Auto"
+          ScrollViewer.VerticalScrollMode="Disabled"
+          ScrollViewer.VerticalScrollBarVisibility="Hidden"
+          SelectionMode="Multiple" SelectionChanged="ListView_SelectionChanged" 
+          x:Name="selectListView" CanDrag="True">
+            <ListView.HeaderTemplate>
+                <DataTemplate>
+                    <Grid Margin="0,0,0,0" Width="1366" Height="Auto" HorizontalAlignment="Left">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"></RowDefinition>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*"/>
+                            <ColumnDefinition Width="2*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="Permit #" MaxLines="2" TextWrapping="WrapWholeWords"/>
+                        <TextBlock Grid.Column="1" Text="County" TextWrapping="WrapWholeWords" />
+                    </Grid>
+                </DataTemplate>
+            </ListView.HeaderTemplate>
+            <x:String>i</x:String>
+            <x:String>i2</x:String>
+        </ListView>
+
+    </Grid>
+</Page>

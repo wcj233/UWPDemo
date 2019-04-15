@@ -36,7 +36,7 @@
           </uap:FileTypeAssociation>
         </uap:Extension>
         <uap:Extension Category="windows.protocol">
-          <uap:Protocol Name="test-app2app" ReturnResults="none" />
+          <uap:Protocol Name="test-app2app" ReturnResults="always" />
         </uap:Extension>
         <uap:Extension Category="windows.autoPlayContent">
           <uap:AutoPlayContent>
@@ -53,6 +53,11 @@
             </uap:SupportedFileTypes>
           </uap:FileTypeAssociation>
         </uap:Extension>
+        <Extension Category="windows.backgroundTasks" EntryPoint="Tasks.ExampleBackgroundTask">
+          <BackgroundTasks>
+            <Task Type="systemEvent" />
+          </BackgroundTasks>
+        </Extension>
       </Extensions>
     </Application>
   </Applications>

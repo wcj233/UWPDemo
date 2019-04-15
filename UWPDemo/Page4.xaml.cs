@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.ApplicationModel.Activation;
+using Windows.ApplicationModel.Background;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Storage;
@@ -86,47 +87,115 @@ namespace UWPDemo
             this.ViewModel.pictures = newPictures;
         }
 
-        private async void Add_Click(object sender, RoutedEventArgs e)
+        private void Add_Click(object sender, RoutedEventArgs e)
         {
 
             // Path to the file in the app package to launch
-            //Escape one:
-            //string imageFile = "Assets\\1.jpg";
-            //two
-            string imageFile = @"Assets\1.jpg";
+        //    Escape one:
+        //    string imageFile = "Assets\\1.jpg";
+        //    two
+        //    string imageFile = @"Assets\1.jpg";
 
-            var file = await Windows.ApplicationModel.Package.Current.InstalledLocation.GetFileAsync(imageFile);
+        //    var file = await Windows.ApplicationModel.Package.Current.InstalledLocation.GetFileAsync(imageFile);
 
-            if (file != null)
+        //    if (file != null)
+        //    {
+        //        Launch the retrieved file
+        //        var options = new Windows.System.LauncherOptions();
+        //        options.DisplayApplicationPicker = true;
+
+        //        Launch the retrieved file
+        //        bool success = await Windows.System.Launcher.LaunchFileAsync(file, options);
+
+        //        if (success)
+        //        {
+        //            File launched
+        //        }
+        //        else
+        //        {
+        //            File launch failed
+        //        }
+        //    }
+        //    else
+        //    {
+        //        Could not find file
+        //    }
+        //    var uriA = new Uri("alsdk:");
+        //    var promptOptions = new Windows.System.LauncherOptions();
+        //    promptOptions.TreatAsUntrusted = true;
+        //    promptOptions.DesiredRemainingView = Windows.UI.ViewManagement.ViewSizePreference.UseMinimum;
+        //    var success = await Launcher.LaunchUriAsync(uriA, promptOptions);
+        //    if (success)
+        //    {
+
+        //    }
+        //}
+
+    }
+
+
+
+        //common backgroundTask method
+        public static BackgroundTaskRegistration RegisterBackgroundTask(
+                                                string taskEntryPoint,
+                                                string name,
+                                                IBackgroundTrigger trigger,
+                                                IBackgroundCondition condition)
+        {
+            //
+            // Check for existing registrations of this background task.
+            //
+
+            foreach (var cur in BackgroundTaskRegistration.AllTasks)
             {
-                // Launch the retrieved file
-                var options = new Windows.System.LauncherOptions();
-                options.DisplayApplicationPicker = true;
 
-                // Launch the retrieved file
-                bool success = await Windows.System.Launcher.LaunchFileAsync(file, options);
-
-                if (success)
+                if (cur.Value.Name == "ExampleBackgroundTask")
                 {
-                    // File launched
-                }
-                else
-                {
-                    // File launch failed
+                    //
+                    // The task is already registered.
+                    //
+                    //cur.Value.Unregister(true);
+                    return (BackgroundTaskRegistration)(cur.Value);
                 }
             }
-            else
-            {
-                // Could not find file
-            }
-            //var uriA = new Uri("alsdk:");
-            //var promptOptions = new Windows.System.LauncherOptions();
-            //promptOptions.TreatAsUntrusted = true;
-            //promptOptions.DesiredRemainingView = Windows.UI.ViewManagement.ViewSizePreference.UseMinimum;
-            //var success = await Launcher.LaunchUriAsync(uriA,promptOptions);
-            //if (success) {
 
-            //}
+            //
+            // Register the background task.
+            //
+
+            var builder = new BackgroundTaskBuilder();
+
+            builder.Name = name;
+
+            // in-process background tasks don't set TaskEntryPoint
+            if (taskEntryPoint != null && taskEntryPoint != String.Empty)
+            {
+                builder.TaskEntryPoint = taskEntryPoint;
+            }
+            builder.SetTrigger(trigger);
+
+            if (condition != null)
+            {
+                builder.AddCondition(condition);
+            }
+
+            BackgroundTaskRegistration task = builder.Register();
+
+            return task;
+        }
+
+        //monitor progress
+        private void OnProgress(IBackgroundTaskRegistration task, BackgroundTaskProgressEventArgs args) {
+            var progress = "Progress: " + args.Progress + "%";
+        }
+
+        //out-process task finish notifi
+        private void OnCompleted(IBackgroundTaskRegistration task, BackgroundTaskCompletedEventArgs args)
+        {
+            var settings = ApplicationData.Current.LocalSettings;
+            var key = task.TaskId.ToString();
+            var message = settings.Values[key].ToString();
+            //UpdateUI(message);
         }
 
         async internal void DisplayImages(Windows.Storage.StorageFolder rootFolder)
