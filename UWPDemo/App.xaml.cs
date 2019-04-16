@@ -17,6 +17,8 @@ using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using Windows.Storage;
 using Windows.ApplicationModel.Background;
+using Microsoft.QueryStringDotNET;
+using Windows.UI.Notifications;
 
 namespace UWPDemo
 {
@@ -52,8 +54,26 @@ namespace UWPDemo
         protected override void OnBackgroundActivated(BackgroundActivatedEventArgs args)
         {
             base.OnBackgroundActivated(args);
-            IBackgroundTaskInstance taskInstance = args.TaskInstance;
+            //IBackgroundTaskInstance taskInstance = args.TaskInstance;
             //DoYourBackgroundWork(taskInstance);
+            var deferral = args.TaskInstance.GetDeferral();
+
+            switch (args.TaskInstance.Task.Name)
+            {
+                case "ToastBackgroundTask":
+                    var details = args.TaskInstance.TriggerDetails as ToastNotificationActionTriggerDetail;
+                    if (details != null)
+                    {
+                        string arguments = details.Argument;
+                        var userInput = details.UserInput;
+
+                        // Perform tasks
+                    }
+                    break;
+            }
+
+            deferral.Complete();
+
         }
 
         protected override void OnFileActivated(FileActivatedEventArgs args)
@@ -99,13 +119,21 @@ namespace UWPDemo
                 //no result
                 ProtocolActivatedEventArgs eventArgs = args as ProtocolActivatedEventArgs;
                 frame.Navigate(typeof(Page4), eventArgs.Uri);
-                
+
             }
-            else if (args.Kind == ActivationKind.ProtocolForResults) {
+            else if (args.Kind == ActivationKind.ProtocolForResults)
+            {
                 //result
                 ProtocolForResultsActivatedEventArgs eventArgs = args as ProtocolForResultsActivatedEventArgs;
                 frame.Navigate(typeof(MainPage), eventArgs);
             }
+            else if (args is ToastNotificationActivatedEventArgs) {
+                var toastArgs = args as ToastNotificationActivatedEventArgs;
+                QueryString qs = QueryString.Parse(toastArgs.Argument);
+
+            }
+
+
             Window.Current.Activate();  
         }
 
@@ -175,7 +203,7 @@ namespace UWPDemo
                     // When the navigation stack isn't restored navigate to the first page,
                     // configuring the new page by passing required information as a navigation
                     // parameter
-                    rootFrame.Navigate(typeof(Page5), e.Arguments);
+                    rootFrame.Navigate(typeof(Page4), e.Arguments);
                     ReadTimestamp();
                 }
                 // Ensure the current window is active

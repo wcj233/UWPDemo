@@ -27,12 +27,12 @@ namespace UWPDemo
         }
         public PictureModel()
         {
-            //this.myPictures.Add(new Picture { picturePath = "Assets/1.jpg" });
-            //this.myPictures.Add(new Picture { picturePath = "Assets/2.jpg" });
-            //this.myPictures.Add(new Picture { picturePath = "Assets/3.jpg" });
-            this.myPictures.Add(new Picture { picturePath = "http://img15.3lian.com/2015/f3/18/d/27.jpg" });
-            this.myPictures.Add(new Picture { picturePath = "http://img15.3lian.com/2015/f3/18/d/27.jpg" });
-            this.myPictures.Add(new Picture { picturePath = "http://img15.3lian.com/2015/f3/18/d/27.jpg" });
+            this.myPictures.Add(new Picture { picturePath = "Assets/1.jpg" });
+            this.myPictures.Add(new Picture { picturePath = "Assets/2.jpg" });
+            this.myPictures.Add(new Picture { picturePath = "Assets/3.jpg" });
+            //this.myPictures.Add(new Picture { picturePath = "https://picsum.photos/48?image=883" });
+            //this.myPictures.Add(new Picture { picturePath = "https://img15.3lian.com/2015/f3/18/d/27.jpg" });
+            //this.myPictures.Add(new Picture { picturePath = "https://img15.3lian.com/2015/f3/18/d/27.jpg" });
 
 
 

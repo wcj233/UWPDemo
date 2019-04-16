@@ -1,15 +1,22 @@
-﻿using System;
+﻿using Microsoft.Toolkit.Uwp.Notifications;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading.Tasks;
+using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 using Windows.ApplicationModel.Background;
+using Windows.ApplicationModel.Core;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.Foundation.Metadata;
 using Windows.Storage;
 using Windows.System;
+using Windows.UI.Notifications;
+using Windows.UI.StartScreen;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -29,7 +36,7 @@ namespace UWPDemo
     {
         DispatcherTimer dispatcherTimer;
 
-        public int[] getRandomNum(int num, int minValue, int maxValue)
+        public async Task<int[]> getRandomNum(int num, int minValue, int maxValue)
         {
             Random ra = new Random(unchecked((int)DateTime.Now.Ticks));
             int[] arrNum = new int[num];
@@ -38,20 +45,20 @@ namespace UWPDemo
             for (int i = 0; i <= num - 2; i++)
             {
                 tmp = ra.Next(minValue, maxValue); //随机取数
-                arrNum[i] = getNum(arrNum, tmp, minValue, maxValue, ra); //取出值赋到数组中
-                sum += tmp;
+                arrNum[i] = await getNum(arrNum, tmp, minValue, maxValue, ra); //取出值赋到数组中
+                sum += arrNum[i];
             }
             arrNum[2] = 3 - sum;
             return arrNum;
         }
 
-        public int getNum(int[] arrNum, int tmp, int minValue, int maxValue, Random ra)
+        public async Task<int> getNum(int[] arrNum, int tmp, int minValue, int maxValue, Random ra)
         {
             int id = Array.IndexOf(arrNum, tmp);
             if (id != -1)
             {
                 tmp = ra.Next(minValue, maxValue);
-                getNum(arrNum, tmp, minValue, maxValue, ra);
+                await getNum(arrNum, tmp, minValue, maxValue, ra);
             }
 
             return tmp;
@@ -60,12 +67,15 @@ namespace UWPDemo
         {
             this.InitializeComponent();
             this.ViewModel = new PictureModel();
+            refreshTile(new int[]{ 0,1,2 },false);
             dispatcherTimer = new DispatcherTimer();
             dispatcherTimer.Tick += dispatcherTimer_Tick;
-            dispatcherTimer.Interval = TimeSpan.FromSeconds(10);
+            dispatcherTimer.Interval = TimeSpan.FromSeconds(5);
             dispatcherTimer.Start();
 
+
         }
+
          public PictureModel ViewModel { get; set; }
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
@@ -74,17 +84,75 @@ namespace UWPDemo
         }
 
         public void dispatcherTimer_Tick(object sender, object e) {
-            int[] arr = getRandomNum(3, 0, 3);
+            Task<int[]> result = getRandomNum(3, 0, 3);
+            int[] arr = result.Result;
             string[] imagePath = { "Assets/1.jpg", "Assets/2.jpg", "Assets/3.jpg" };
             ObservableCollection<Picture> newPictures = new ObservableCollection<Picture>();
-            newPictures.Add(new Picture { picturePath = "Assets/2.jpg" });
-            newPictures.Add(new Picture { picturePath = "Assets/1.jpg" });
-            newPictures.Add(new Picture { picturePath = "Assets/3.jpg" });
-            //newPictures = this.ViewModel.pictures;
-            //this.ViewModel.pictures[0].picturePath = "Assets/2.jpg";
-            //this.ViewModel.pictures[1].picturePath = "Assets/1.jpg";
-            //this.ViewModel.pictures[2].picturePath = "Assets/3.jpg";
+            newPictures.Add(new Picture { picturePath = imagePath[arr[0]] });
+            newPictures.Add(new Picture { picturePath = imagePath[arr[1]] });
+            newPictures.Add(new Picture { picturePath = imagePath[arr[2]] });
             this.ViewModel.pictures = newPictures;
+
+            //refresh tile
+            refreshTile(arr,true);
+        }
+
+        private async void refreshTile(int[] arr,bool isRefresh) {
+            //check
+            AppListEntry entry = (await Package.Current.GetAppListEntriesAsync())[0];
+            bool isSupport = StartScreenManager.GetDefault().SupportsAppListEntry(entry);
+            if (isSupport) {
+                bool isPinned = await StartScreenManager.GetDefault().ContainsAppListEntryAsync(entry);
+                if (isPinned) {
+                    var updater = TileUpdateManager.CreateTileUpdaterForApplication();
+                    updater.Clear();
+                    string[] imagePath = { "Assets/1.jpg", "Assets/2.jpg", "Assets/3.jpg" };
+                    for (int i = 0; i < arr.Length; i++)
+                    {
+                        int index = arr[i];
+                        TileContent content = new TileContent()
+                        {
+                            Visual = new TileVisual()
+                            {
+                                TileWide = new TileBinding()
+                                {
+                                    Content = new TileBindingContentAdaptive()
+                                    {
+                                        Children = {
+                                            new AdaptiveImage(){
+                                                Source = imagePath[index]
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        };
+                        var notification = new TileNotification(content.GetXml());
+                        TileUpdateManager.CreateTileUpdaterForApplication().Update(notification);
+                    }
+                }
+            }
+            ToastVisual visual = new ToastVisual()
+            {
+                BindingGeneric = new ToastBindingGeneric(){
+                    Children = {
+                        new AdaptiveText(){
+                            Text = "Pictures are updated."
+                        }
+                    }
+                }
+            };
+
+            if (isRefresh) {
+                //toast noti
+                ToastContent toastContent = new ToastContent()
+                {
+                    Visual = visual
+                };
+                var toast = new ToastNotification(toastContent.GetXml());
+                ToastNotificationManager.CreateToastNotifier().Show(toast);
+            }
+
         }
 
         private void Add_Click(object sender, RoutedEventArgs e)
