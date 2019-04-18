@@ -19,6 +19,10 @@ using Windows.Storage;
 using Windows.ApplicationModel.Background;
 using Microsoft.QueryStringDotNET;
 using Windows.UI.Notifications;
+using Microsoft.Toolkit.Uwp.Notifications;
+using Windows.ApplicationModel.DataTransfer.ShareTarget;
+using Windows.ApplicationModel.DataTransfer;
+using Windows.Storage.Streams;
 
 namespace UWPDemo
 {
@@ -46,7 +50,61 @@ namespace UWPDemo
         }
 
         public async void register() {
+            //BackgroundExecutionManager.RemoveAccess();
             await BackgroundExecutionManager.RequestAccessAsync();
+        }
+
+        //receive data
+        protected override async void OnShareTargetActivated(ShareTargetActivatedEventArgs args)
+        {
+            base.OnShareTargetActivated(args);
+            // Code to handle activation goes here.
+            ShareOperation sp = args.ShareOperation;
+            sp.ReportStarted();
+            if (sp.Data.Contains(StandardDataFormats.Text)) {
+                string text = await sp.Data.GetTextAsync();
+            }
+            if (sp.Data.Contains(StandardDataFormats.StorageItems))
+            {
+                IReadOnlyList <IStorageItem> files = await sp.Data.GetStorageItemsAsync();
+            }
+
+            if (sp.Data.Contains(StandardDataFormats.WebLink)) {
+
+            }
+            if (sp.Data.Contains(StandardDataFormats.ApplicationLink))
+            {
+
+            }
+            if (sp.Data.Contains(StandardDataFormats.Html))
+            {
+
+            }
+            if (sp.Data.Contains(StandardDataFormats.Bitmap))
+            {
+
+            }
+
+        }
+
+        async void ReportCompleted(ShareOperation shareOperation, string quickLinkId, string quickLinkTitle)
+        {
+            QuickLink quickLinkInfo = new QuickLink
+            {
+                Id = quickLinkId,
+                Title = quickLinkTitle,
+
+                // For quicklinks, the supported FileTypes and DataFormats are set 
+                // independently from the manifest
+                SupportedFileTypes = { "*" },
+                SupportedDataFormats = { StandardDataFormats.Text,
+                StandardDataFormats.Bitmap, StandardDataFormats.StorageItems }
+            };
+
+            StorageFile iconFile = await Windows.ApplicationModel.Package.Current.InstalledLocation.CreateFileAsync(
+                    "assets\\1.jpg", CreationCollisionOption.OpenIfExists);
+            quickLinkInfo.Thumbnail = RandomAccessStreamReference.CreateFromFile(iconFile);
+            shareOperation.ReportCompleted(quickLinkInfo);
         }
 
         //in-process background task
@@ -58,19 +116,64 @@ namespace UWPDemo
             //DoYourBackgroundWork(taskInstance);
             var deferral = args.TaskInstance.GetDeferral();
 
-            switch (args.TaskInstance.Task.Name)
-            {
-                case "ToastBackgroundTask":
-                    var details = args.TaskInstance.TriggerDetails as ToastNotificationActionTriggerDetail;
-                    if (details != null)
-                    {
-                        string arguments = details.Argument;
-                        var userInput = details.UserInput;
-
-                        // Perform tasks
-                    }
-                    break;
+            if (args.TaskInstance.Task.Name is "ToastBackgroundTask2") {
+                args.TaskInstance.Task.Unregister(true);
             }
+
+            ToastVisual visual = new ToastVisual()
+            {
+                BindingGeneric = new ToastBindingGeneric()
+                {
+                    Children = {
+                        new AdaptiveText(){
+                            Text = "Pictures are updated."
+                        }
+                    }
+                }
+            };
+
+            ToastActionsCustom actions = new ToastActionsCustom()
+            {
+                Buttons = {
+                    new ToastButton("Back",new QueryString{
+                        { "action","background" }
+                    }.ToString()){
+                        ActivationType = ToastActivationType.Background
+                    },
+                    new ToastButton("Fore",new QueryString{
+                        { "action","foreground" }
+                    }.ToString()){
+                        ActivationType = ToastActivationType.Foreground
+                    }
+                }
+
+            };
+
+           
+                //toast noti
+                ToastContent toastContent = new ToastContent()
+                {
+                    Visual = visual,
+                    Actions = actions
+                };
+            
+
+                var toast = new ToastNotification(toastContent.GetXml());
+                ToastNotificationManager.CreateToastNotifier().Show(toast);
+
+            //switch (args.TaskInstance.Task.Name)
+            //{
+            //    case "ToastBackgroundTask":
+            //        var details = args.TaskInstance.TriggerDetails as ToastNotificationActionTriggerDetail;
+            //        if (details != null)
+            //        {
+            //            string arguments = details.Argument;
+            //            var userInput = details.UserInput;
+
+            //            // Perform tasks
+            //        }
+            //        break;
+            //}
 
             deferral.Complete();
 
@@ -108,7 +211,7 @@ namespace UWPDemo
             
         }
 
-        protected override void OnActivated(IActivatedEventArgs args)
+        protected override async void OnActivated(IActivatedEventArgs args)
         {
             var frame = Window.Current.Content as Frame;
             if (frame == null)
@@ -128,6 +231,13 @@ namespace UWPDemo
                 frame.Navigate(typeof(MainPage), eventArgs);
             }
             else if (args is ToastNotificationActivatedEventArgs) {
+                ContentDialog contentDialog = new ContentDialog {
+                    Title = "No wifi connection",
+                    Content = "Check your connection and try again.",
+                    CloseButtonText = "Ok"
+                };
+                ContentDialogResult result = await contentDialog.ShowAsync();
+
                 var toastArgs = args as ToastNotificationActivatedEventArgs;
                 QueryString qs = QueryString.Parse(toastArgs.Argument);
 
@@ -203,7 +313,7 @@ namespace UWPDemo
                     // When the navigation stack isn't restored navigate to the first page,
                     // configuring the new page by passing required information as a navigation
                     // parameter
-                    rootFrame.Navigate(typeof(Page4), e.Arguments);
+                    rootFrame.Navigate(typeof(Page5), e.Arguments);
                     ReadTimestamp();
                 }
                 // Ensure the current window is active

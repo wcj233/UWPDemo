@@ -8,15 +8,39 @@
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
-    <Grid>
-        <!--<Image x:Name="Image" CanDrag="True" Margin="10,292,10,0" Height="338" Source="Assets\1.jpg"></Image>-->
-        <ListView 
+    <Grid> 
+        <!--<Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <StackPanel x:Name="HeaderPanel" Orientation="Horizontal" Grid.Row="0">
+                <TextBlock x:Name="Header"
+                   Text="Basic ink sample"
+                   Style="{ThemeResource HeaderTextBlockStyle}"
+                   Margin="10,0,0,0" />
+            </StackPanel>
+            <Grid Grid.Row="1">
+                <Image Source="Assets\StoreLogo.png" />
+                <InkCanvas x:Name="inkCanvas" />
+            </Grid>
+        </Grid>-->
+
+        <!--<Rectangle Name="touchRectangle"
+           Height="100" Width="200" Fill="Blue" />-->
+        <!--<Image Source="https://picsum.photos/360/202?image=883" Height="100" Width="100"/>-->
+        <StackPanel AllowDrop="True" DragOver="Grid_DragOver" Drop="Grid_Drop" Height="300" VerticalAlignment="Top" Background="AliceBlue">
+            <TextBox x:Name="fileInfo"></TextBox>
+            <Image x:Name="Image" CanDrag="True" Height="100" Width="100" Margin="30"></Image>
+        </StackPanel>
+        
+        <!--<ListView 
           ScrollViewer.HorizontalScrollMode="Enabled" 
           ScrollViewer.HorizontalScrollBarVisibility="Auto"
           ScrollViewer.VerticalScrollMode="Disabled"
           ScrollViewer.VerticalScrollBarVisibility="Hidden"
           SelectionMode="Multiple" SelectionChanged="ListView_SelectionChanged" 
-          x:Name="selectListView" CanDrag="True">
+          x:Name="selectListView" CanDrag="True" Height="300" AllowDrop="True" DragOver="Grid_DragOver" Drop="Grid_Drop">
             <ListView.HeaderTemplate>
                 <DataTemplate>
                     <Grid Margin="0,0,0,0" Width="1366" Height="Auto" HorizontalAlignment="Left">
@@ -34,7 +58,7 @@
             </ListView.HeaderTemplate>
             <x:String>i</x:String>
             <x:String>i2</x:String>
-        </ListView>
+        </ListView>-->
 
     </Grid>
 </Page>
